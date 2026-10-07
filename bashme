@@ -128,12 +128,13 @@ help(){
 	cmds[bashme]="Edit this bash-config."
 	cmds[helpme]="Prints this."
 
-	echo 'my aliases:'
+	echo -e "\nmy aliases: \n"
+
 	for key in "${!cmds[@]}"; do
 		echo "$key: ${cmds[$key]}"
 	done
-	echo -e '\n'
-
+		
+	echo -e "\n"
 }
 alias helpme='help'
 
