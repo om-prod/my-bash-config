@@ -26,8 +26,6 @@ check_projdest()
 }
 
 goto_py(){
-	proj=$(check_projdest)
-	
 	if [ $proj -eq 1 ]; then
 		fp_py_="$(file -b $fp_py)"
 		py_vn_="$(file -b $fp_py/$py_vn)"
@@ -47,8 +45,6 @@ goto_py(){
 }
 
 goto_c(){
-	proj=$(check_projdest)
-	
 	if [ $proj -eq 1 ]; then	
 		fp_c_="$(file -b $fp_c)" 
 	
@@ -65,8 +61,6 @@ goto_c(){
 }
 
 goto_cpp(){
-	proj=$(check_projdest)
-	
 	if [ $proj -eq 1 ]; then
 		fp_cpp_="$(file -b $fp_cpp)"
 	
@@ -83,8 +77,6 @@ goto_cpp(){
 }
 
 goto_home(){
-	proj=$(check_projdest)
-	
 	if [ $proj -eq 1 ]; then
 		cd $fp_proj
 	else
@@ -99,6 +91,8 @@ fp_cpp="$fp_proj/cpp-projects"
 fp_c="$fp_proj/c-projects"
 fp_py="$fp_proj/python-projects/"
 py_vn=".vn/bin/activate"
+
+proj="$(check_projdest)"
 
 # Aliases pointing to their respective functions
 alias pjpy='goto_py'
@@ -117,7 +111,7 @@ else
 fi
 
 # Alias for help function
-help(){
+helpfunc(){
 	declare -A cmds
 	cmds[pjpy]="Go to python-projects-folder."
 	cmds[pjc]="Go to c-projects-folder."
@@ -128,6 +122,9 @@ help(){
 	cmds[bashme]="Edit this bash-config."
 	cmds[helpme]="Prints this."
 
+	echo -e "\npossible issue:"
+	echo "the aliases would still run normally even after changes in the code;"
+	echo to get feedback, create a new terminal instance.
 	echo -e "\nmy aliases: \n"
 
 	for key in "${!cmds[@]}"; do
@@ -136,7 +133,7 @@ help(){
 		
 	echo -e "\n"
 }
-alias helpme='help'
+alias helpme='helpfunc'
 
 # Randomized greeter
 chara=("Satania" "Gabriel" "Yui" "Mio" "Megumin" "$user -- THE OWNER")
