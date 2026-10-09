@@ -97,12 +97,12 @@ tpd()
 }
 
 # creating a way to open files in sublime through the terminal
-sublime()
-{
-	path="/opt/sublime_text/sublime_text"
-	file=$1
-	/opt/sublime_text/sublime_text $file
-}
+#sublime()
+#{
+#	path="/opt/sublime_text/sublime_text"
+#	file=$1
+#	/opt/sublime_text/sublime_text $file
+#}
 
 # edit this file
 fp_self="/home/$user/my_bash_config/bashme.sh"
