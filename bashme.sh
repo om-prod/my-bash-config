@@ -6,11 +6,11 @@ keyprio()
 	state=$1
 
 	if [ "$state" == "ext" ]; then
-		xinput disable "AT Translated Set 2 keyboard" && echo "Laptop-Keyboard-Priority: External"  
+		xinput disable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: External"  
 	elif [ "$state" == "int" ]; then
-		xinput enable "AT Translated Set 2 keyboard" && echo "Laptop-Keyboard-Priority: internal"
+		xinput enable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: internal"
 	else 
-		echo "The two states of priority are: external (ext) and internal (int)"
+		echo "[bashme] The two states of priority are: external (ext) and internal (int)"
 	fi
 }
 
@@ -53,46 +53,46 @@ tpd()
 
 	if [ $proj -eq 1 ]; then
 		# Probably much better to do a list and have checks, but idk
-		if [[ $dest == "py" || $dest == "python" ]]; then
+		if [[ "$dest" == "py" || "$dest" == "python" ]]; then
 			fp_py_="$(file -b $fp_py)"
 			py_vn_="$(file -b $fp_py/$py_vn)"
 
 			if [[ $fp_py_ == "directory" && $py_vn_ == "ASCII text" ]]; then
 				cd $fp_py
 				source $py_vn
-				echo "py-venv automatically deactivates when jumping to other project-folders,"
-				echo "and to deactivate manually, type: deactivate"
+				echo "[bashme] py-venv automatically deactivates when jumping to other project-folders,"
+				echo "[bashme] and to deactivate manually, type: deactivate"
 			else
-				echo "something went wrong with the py-folder-path or py-venv-folder-path. check code."
+				echo "[bashme] something went wrong with the py-folder-path or py-venv-folder-path. check code."
 				cd
 			fi
-		elif [ $dest == "c" ]; then
+		elif [ "$dest" == "c" ]; then
 			fp_c_="$(file -b $fp_c)"
 
 			if [ $fp_c_ == "directory" ]; then
 				cd $fp_c
 			else
-				echo "something went wrong with the c-folder-path. check code."
+				echo "[bashme] something went wrong with the c-folder-path. check code."
 				cd
 			fi
-		elif [ $dest == "cpp" ]; then
+		elif [ "$dest" == "cpp" ]; then
 			fp_cpp_="$(file -b $fp_cpp)"
 
 			if [ $fp_cpp_ == "directory" ]; then
 				cd $fp_cpp
 			else
-				echo "something went wrong with the cpp-folder-path. check code."
+				echo "[bashme] something went wrong with the cpp-folder-path. check code."
 				cd
 			fi
-		elif [ $dest == "home" ]; then
+		elif [ "$dest" == "home" ]; then
 			cd $fp_proj
 		else
-			echo -e "\nhow come you forgot the project-folders you set?"
-			echo -e "those are (for now): 'py', 'c', 'cpp', and the 'home' folders\n"
+			echo -e "-- bashme start --\nhow come you forgot the project-folders you set?"
+			echo -e "those are (for now): 'py', 'c', 'cpp', and the 'home' folders\n-- bashme end --"
 
 		fi 
 	else
-		echo "something went wrong with the project-folder-path. check code."
+		echo "[bashme] something went wrong with the project-folder-path. check code."
 	fi
 }
 
@@ -104,26 +104,55 @@ tpd()
 #	/opt/sublime_text/sublime_text $file
 #}
 
-# edit this file
+# adb connect and shell in one function;
+# basic adb ...  not much to see here. 
+# needs adb to work 
+shelldroid(){
+	custom_ip=$1
+	custom_port=$2
+
+	if [[ "$custom_ip" != "" && "$custom_port" != "" ]]; then
+		activity="$(adb devices | grep $custom_ip)"
+		
+		if [ "$activity" != "" ]; then
+			clear
+			echo -e "[open-connection on $custom_ip:$custom_port ; still active]\n[deactivate by 'shelldroid off']\n"
+			echo -e "================================================\n"
+			adb shell
+		# the IP-regex came from good ol' StackOverflow 
+		elif [[ $custom_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ && $custom_port -ge 0 && $custom_port -le 65535 ]]; then
+			clear; adb connect $custom_ip:$custom_port && adb shell
+		else 
+			echo "[bashme] ip -- port error"
+		fi
+	elif [[ "$custom_ip" == "off" ]]; then
+		echo "[bashme-adb] $(adb disconnect)"; 
+	else
+		echo "[bashme] forgot to include ip or port?: shelldroid <ip> <port>"
+	fi
+
+}
+
+# to edit this file
 fp_self="/home/$user/my_bash_config/bashme.sh"
 fp_self_="$(file -b $fp_self)"
 
-if [ "$fp_self_" == "ASCII text" ]; then
+if [ "$fp_self_" == "Unicode text, UTF-8 text" ]; then
 	alias bashme='/opt/sublime_text/sublime_text $fp_self'
 else
-	echo "something went wrong with the bashconfig-folder-path. check code."
+	echo "[bashme] something went wrong with the bashconfig-folder-path. check code."
 fi
 
 # help function
 tasukete(){
 	declare -A cmds
-	cmds[sublime]="sublime <file> ; open and edit text-files on sublime"
+	cmds[shelldroid]="shelldroid <ip-addr or off> -- if-ip: <port-addr> ; connects and shells to device."
 	cmds[tpd]="jmp <set project-folders> ; changes/jumps to set directories."
 	cmds[keyprio]="keyprio <priority> ; changes input (keyboard) priority"	
 	cmds[bashme]="Edit this bash-config."
 	cmds[tasukete]="Prints this."
 
-	echo -e "\npossible issue:"
+	echo -e "-- bashme start --\n\npossible issue:"
 	echo "the commands would still run normally even after changes in the code;"
 	echo "to get feedback, create a new terminal instance."
 	echo -e "\nmy-commands: \n"
@@ -132,15 +161,16 @@ tasukete(){
 		echo "$key: ${cmds[$key]}"
 	done
 		
-	echo -e "\n"
+	echo -e "\n-- bashme end --"
 }
 
 alias helpme='tasukete'
 
 # randomized greeter
-chara=("Satania" "Gabriel" "Yui" "Mio" "Megumin" "Miu" "$user -- THE OWNER")
+chara=("Satania" "Gabriel" "Yui" "Mio" "Megumin" "Miu" "$user")
 
 size=${#chara[@]}
 index=$(($RANDOM % $size))
 
-echo -e "\x1b[1mHello ${chara[$index]}, do whatever you want..\ntype: helpme -- tasukete\x1b[0m\n"
+cat /home/sysadmin/Documents/.neoascii/stack-overflow.txt
+echo -e "\x1b[1mこんにちは${chara[$index]}さん, 何でもやってもいいよ..\ntype: helpme or tasukete\x1b[0m\n"
