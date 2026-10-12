@@ -1,4 +1,26 @@
+#!/bin/bash
+
+# modules:
+# - adb 
+# - jq (for reading and writing JSON-files)
+# - ~
 user=$(whoami) # sigma
+json_file="/home/sysadmin/my_bash_config/variables.json"
+
+# function for saving current-working-directory
+swd()
+{
+	clear=$1
+	directory=$(pwd)
+	
+	if [ "$clear" == "clear" ]; then
+		ujson=$(jq '.previousWorkingDirectory = null' $json_file)
+		echo $ujson > $json_file && echo "[bashme] wd-cache cleared."
+	else	
+		ujson=$(jq --arg dir "$directory" '.previousWorkingDirectory = $dir' $json_file)
+		echo $ujson > $json_file && echo "[bashme] saved this directory; run a new terminal to check."
+	fi
+}
 
 # function for disabling Laptop-Keyboard input
 keyprio()
@@ -6,11 +28,16 @@ keyprio()
 	state=$1
 
 	if [ "$state" == "ext" ]; then
+		ujson=$(jq '.keyPriority = "ext"' $json_file)
+		echo $ujson > $json_file
 		xinput disable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: External"  
+
 	elif [ "$state" == "int" ]; then
+		jujson=$(jq '.keyPriority = "int"' $json_file)
+		echo $ujson > $json_file
 		xinput enable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: internal"
 	else 
-		echo "[bashme] The two states of priority are: external (ext) and internal (int)"
+		echo "[bashme] (priority: $(jq '.keyPriority' $json_file)) The two states of priority are: external (ext) and internal (int)"
 	fi
 }
 
@@ -43,7 +70,7 @@ tpd()
 	fp_proj="/home/$user/Documents/Projects_Folder"
 	fp_cpp="$fp_proj/cpp-projects"
 	fp_c="$fp_proj/c-projects"
-	fp_py="$fp_proj/python-projects/"
+	fp_py="$fp_proj/python-projects"
 	py_vn=".vn/bin/activate"
 	
 	proj="$(check_projdest)"	
@@ -130,35 +157,45 @@ shelldroid(){
 	else
 		echo "[bashme] forgot to include ip or port?: shelldroid <ip> <port>"
 	fi
-
 }
 
 # to edit this file
-fp_self="/home/$user/my_bash_config/bashme.sh"
+fp_self="/home/$user/my_bash_config/config.sh"
 fp_self_="$(file -b $fp_self)"
 
-if [ "$fp_self_" == "Unicode text, UTF-8 text" ]; then
-	alias bashme='/opt/sublime_text/sublime_text $fp_self'
+if [ "$fp_self_" == "Bourne-Again shell script, Unicode text, UTF-8 text executable" ]; then
+	alias editme='/opt/sublime_text/sublime_text $fp_self'
 else
 	echo "[bashme] something went wrong with the bashconfig-folder-path. check code."
 fi
 
+# refresh function to refresh config-script
+refresh()
+{
+	cd_=$(pwd)
+	clear
+	source $fp_self
+	cd $cd_
+}
+
 # help function
 tasukete(){
 	declare -A cmds
-	cmds[shelldroid]="shelldroid <ip-addr or off> -- if-ip: <port-addr> ; connects and shells to device."
+
+	cmds[refresh]="Refreshes the config.sh to apply new changes."
+	cmds[swd]="swd or swd clear ; saves current working directory, so that if new session opens it will cd to there."
+	cmds[shelldroid]="shelldroid <ip-addr> <port-addr> ; connects and shells to device."
 	cmds[tpd]="jmp <set project-folders> ; changes/jumps to set directories."
 	cmds[keyprio]="keyprio <priority> ; changes input (keyboard) priority"	
-	cmds[bashme]="Edit this bash-config."
+	cmds[editme]="Edit this bash-config."
 	cmds[tasukete]="Prints this."
 
-	echo -e "-- bashme start --\n\npossible issue:"
-	echo "the commands would still run normally even after changes in the code;"
-	echo "to get feedback, create a new terminal instance."
+	echo -e "-- bashme start --\n\ntips:"
+	echo "made changes to code? type refresh to apply"
 	echo -e "\nmy-commands: \n"
 
 	for key in "${!cmds[@]}"; do
-		echo "$key: ${cmds[$key]}"
+		echo -e "\x1b[4;1m$key\x1b[0m: ${cmds[$key]}"
 	done
 		
 	echo -e "\n-- bashme end --"
@@ -172,5 +209,12 @@ chara=("Satania" "Gabriel" "Yui" "Mio" "Megumin" "Miu" "$user")
 size=${#chara[@]}
 index=$(($RANDOM % $size))
 
-cat /home/sysadmin/Documents/.neoascii/stack-overflow.txt
-echo -e "\x1b[1mこんにちは${chara[$index]}さん, 何でもやってもいいよ..\ntype: helpme or tasukete\x1b[0m\n"
+echo -e "\x1b[1mこんにちは${chara[$index]}さん, 何でもやってもいいよ..\nconfig-cmds: helpme or tasukete\x1b[0m\n"
+
+ujson=$(jq -r '.previousWorkingDirectory' $json_file)
+	
+if [ "$ujson" != "null" ]; then
+	echo "Continuing from where you left off.."
+	echo -e "To clear wd-cache type: swd clear\n"
+	cd $ujson
+fi
