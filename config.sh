@@ -104,7 +104,11 @@ tpd()
 	dest=$1 # <- argv[i]
 	$(check_pyvenv)
 
-	if [ $proj -eq 1 ]; then
+	# Jump to saved-working-directory
+	gjson=$(jq -r '.previousWorkingDirectory' $json_file)
+	if [[ "$dest" == "saved" ]]; then
+		cd $gjson	
+	elif [ $proj -eq 1 ]; then
 		# Probably much better to do a list and have checks, but idk
 
 		if [[ "$dest" == "py" || "$dest" == "python" ]]; then
@@ -237,10 +241,10 @@ index=$(($RANDOM % $size))
 
 echo -e "\x1b[1mこんにちは${chara[$index]}さん, 何でもやってもいいよ..\nconfig-cmds: helpme or tasukete\x1b[0m\n"
 
-ujson=$(jq -r '.previousWorkingDirectory' $json_file)
+gjson=$(jq -r '.previousWorkingDirectory' $json_file)
 	
-if [[ "$ujson" != "null" ]]; then
+if [[ "$gjson" != "null" ]]; then
 	echo "Continuing from where you left off.."
 	echo -e "To clear wd-cache type: swd clear\n"
-	cd $ujson
+	cd $gjson
 fi
