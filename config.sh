@@ -16,9 +16,13 @@ swd()
 	if [ "$clear" == "clear" ]; then
 		ujson=$(jq '.previousWorkingDirectory = null' $json_file)
 		echo $ujson > $json_file && echo "[bashme] wd-cache cleared."
-	else	
+	else
+		gjson=$(jq -r '.previousWorkingDirectory' $json_file)
 		ujson=$(jq --arg dir "$directory" '.previousWorkingDirectory = $dir' $json_file)
-		echo $ujson > $json_file && echo "[bashme] saved this directory; run a new terminal to check."
+
+		if [ "$(pwd)" != "$gjson" ]; then
+			echo $ujson > $json_file && echo "[bashme] saved this directory; run a new terminal to check."
+		fi
 	fi
 }
 
