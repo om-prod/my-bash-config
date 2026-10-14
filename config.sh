@@ -7,6 +7,25 @@
 user=$(whoami) # sigma
 json_file="/home/sysadmin/my_bash_config/variables.json"
 
+# to edit this file
+fp_self="/home/$user/my_bash_config/config.sh"
+fp_self_="$(file -b $fp_self)"
+
+if [ "$fp_self_" == "Bourne-Again shell script, Unicode text, UTF-8 text executable" ]; then
+	alias editme='/opt/sublime_text/sublime_text $fp_self'
+else
+	echo "[bashme] something went wrong with the bashconfig-folder-path. check code."
+fi
+
+# refresh function to refresh config-script
+refresh()
+{
+	cd_=$(pwd)
+	clear
+	source $fp_self
+	cd $cd_
+}
+
 # function for saving current-working-directory
 swd()
 {
@@ -34,12 +53,12 @@ keyprio()
 	if [ "$state" == "ext" ]; then
 		ujson=$(jq '.keyPriority = "ext"' $json_file)
 		echo $ujson > $json_file
-		xinput disable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: External"  
+		xinput disable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: External (Resets to internal on-boot)"  
 
 	elif [ "$state" == "int" ]; then
 		jujson=$(jq '.keyPriority = "int"' $json_file)
 		echo $ujson > $json_file
-		xinput enable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: internal"
+		xinput enable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: Internal"
 	else 
 		echo "[bashme] (priority: $(jq '.keyPriority' $json_file)) The two states of priority are: external (ext) and internal (int)"
 	fi
@@ -84,6 +103,7 @@ tpd()
 
 	if [ $proj -eq 1 ]; then
 		# Probably much better to do a list and have checks, but idk
+
 		if [[ "$dest" == "py" || "$dest" == "python" ]]; then
 			fp_py_="$(file -b $fp_py)"
 			py_vn_="$(file -b $fp_py/$py_vn)"
@@ -163,29 +183,28 @@ shelldroid(){
 	fi
 }
 
-# to edit this file
-fp_self="/home/$user/my_bash_config/config.sh"
-fp_self_="$(file -b $fp_self)"
-
-if [ "$fp_self_" == "Bourne-Again shell script, Unicode text, UTF-8 text executable" ]; then
-	alias editme='/opt/sublime_text/sublime_text $fp_self'
-else
-	echo "[bashme] something went wrong with the bashconfig-folder-path. check code."
-fi
-
-# refresh function to refresh config-script
-refresh()
+# for ettercap default command-paste
+mim()
 {
-	cd_=$(pwd)
-	clear
-	source $fp_self
-	cd $cd_
+	nt_interface=$1
+	network=$2; target=$3
+
+	if [[ $nt_interface != "" && $network != "" && $target != "" ]]; then
+		if [[ $network =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ && $target =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+			sudo ettercap -T -S -i $nt_interface -M arp:remote /$network// /$target//
+		else
+			echo "[bashme] error whilst parsing ip-address."
+		fi			
+	else
+		echo "[bashme] required fields: <network interface (wlan0, etc.)> <network ip> <target ip>"
+	fi
 }
 
 # help function
 tasukete(){
 	declare -A cmds
 
+	cmds[mim]="mim <network interface> <network ip> <target ip> ; does ettercap stuff"
 	cmds[refresh]="Refreshes the config.sh to apply new changes."
 	cmds[swd]="swd or swd clear ; saves current working directory, so that if new session opens it will cd to there."
 	cmds[shelldroid]="shelldroid <ip-addr> <port-addr> ; connects and shells to device."
