@@ -217,7 +217,7 @@ echo -e "\x1b[1mこんにちは${chara[$index]}さん, 何でもやってもい�
 
 ujson=$(jq -r '.previousWorkingDirectory' $json_file)
 	
-if [[ "$ujson" != "null"  && "$(pwd)" == "$ujson" ]]; then
+if [[ "$ujson" != "null" ]]; then
 	echo "Continuing from where you left off.."
 	echo -e "To clear wd-cache type: swd clear\n"
 	cd $ujson
