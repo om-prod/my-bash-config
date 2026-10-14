@@ -7,8 +7,9 @@
 user=$(whoami) # sigma
 json_file="/home/sysadmin/my_bash_config/variables.json"
 
-# battery alias
+# aliases
 alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
+alias bye='exit'
 
 # to edit this file
 fp_self="/home/$user/my_bash_config/config.sh"
