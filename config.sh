@@ -11,6 +11,10 @@ __json_file__="$HOME/my_bash_config/variables.json"
 alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
 alias bye='exit'
 alias wtfa='cd $__wtfa__'
+# git related aliases
+alias gpo='git push origin'
+
+
 
 # to edit this file
 __fp_self__="$HOME/my_bash_config/config.sh"
