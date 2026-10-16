@@ -82,7 +82,7 @@ keyprio()
 }
 
 # functions for going to different projects dest./folders
-check_pyvenv()
+__check_pyvenv()
 {
  	is_vevn="$(type -t deactivate)"
 
@@ -92,7 +92,7 @@ check_pyvenv()
 	fi
 }
 
-check_projdest()
+__check_projdest()
 {
 	fp_proj_="$(file -b $fp_proj)"
 
@@ -113,10 +113,10 @@ tpd()
 	fp_py="$fp_proj/python-projects"
 	py_vn=".vn/bin/activate"
 	
-	proj="$(check_projdest)"	
+	proj="$(__check_projdest)"	
 	
 	dest=$1 # <- argv[i]
-	$(check_pyvenv)
+	$(__check_pyvenv)
 
 	# Jump to saved-working-directory
 	gjson=$(jq -r '.previousWorkingDirectory' $__json_file__)
@@ -225,6 +225,10 @@ mim()
 tasukete(){
 	declare -A cmds
 
+	cmds[gpo]="Shortcut of 'git push origin'"
+	cmds[bye]="Exits"
+	cmds[wtfa]="Change directory to wherever this file is."
+	cmds[buttery]="Returns battery information."
 	cmds[tim]="tim <file> ; opens a new terminal-tab and edits provided file with vim"
 	cmds[mim]="mim <network interface> <network ip> <target ip> ; does ettercap stuff"
 	cmds[refresh]="Refreshes the config.sh to apply new changes."
