@@ -4,21 +4,22 @@
 # - adb 
 # - jq (for reading and writing JSON-files)
 # - ~
-user=$(whoami) # sigma
-json_file="/home/sysadmin/my_bash_config/variables.json"
+__wtfa__="$HOME/my_bash_config/"
+__json_file__="$HOME/my_bash_config/variables.json"
 
 # aliases
 alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
 alias bye='exit'
+alias wtfa='cd $__wtfa__'
 
 # to edit this file
-fp_self="/home/$user/my_bash_config/config.sh"
-fp_self_="$(file -b $fp_self)"
+__fp_self__="$HOME/my_bash_config/config.sh"
+__is_fp__="$(file -b $__fp_self__)"
 
-if [ "$fp_self_" == "Bourne-Again shell script, Unicode text, UTF-8 text executable" ]; then
-	alias editme='/opt/sublime_text/sublime_text $fp_self'
+if [ "$__is_fp__" == "Bourne-Again shell script, Unicode text, UTF-8 text executable" ]; then
+	alias editme='/opt/sublime_text/sublime_text $__fp_self__'
 else
-	echo "[bashme] something went wrong with the bashconfig-folder-path. check code."
+	echo "> something went wrong with the bashconfig-folder-path. check code."
 fi
 
 # refresh function to refresh config-script
@@ -26,8 +27,18 @@ refresh()
 {
 	cd_=$(pwd)
 	clear
-	source $fp_self
+	source $__fp_self__
 	cd $cd_
+}
+
+tim(){
+	file=$1
+
+	if [ "$file" != "" ]; then
+		gnome-terminal --tab -- nvim $file
+	else 
+		echo "> provide a file to edit."
+	fi
 }
 
 # function for saving current-working-directory
@@ -37,14 +48,14 @@ swd()
 	directory=$(pwd)
 	
 	if [ "$clear" == "clear" ]; then
-		ujson=$(jq '.previousWorkingDirectory = null' $json_file)
-		echo $ujson > $json_file && echo "[bashme] wd-cache cleared."
+		ujson=$(jq '.previousWorkingDirectory = null' $__json_file__)
+		echo $ujson > $__json_file__ && echo "> wd-cache cleared."
 	else
-		gjson=$(jq -r '.previousWorkingDirectory' $json_file)
-		ujson=$(jq --arg dir "$directory" '.previousWorkingDirectory = $dir' $json_file)
+		gjson=$(jq -r '.previousWorkingDirectory' $__json_file__)
+		ujson=$(jq --arg dir "$directory" '.previousWorkingDirectory = $dir' $__json_file__)
 
 		if [ "$(pwd)" != "$gjson" ]; then
-			echo $ujson > $json_file && echo "[bashme] saved this directory; run a new terminal to check."
+			echo $ujson > $__json_file__ && echo "> saved this directory; run a new terminal to check."
 		fi
 	fi
 }
@@ -55,16 +66,16 @@ keyprio()
 	state=$1
 
 	if [ "$state" == "ext" ]; then
-		ujson=$(jq '.keyPriority = "ext"' $json_file)
-		echo $ujson > $json_file
-		xinput disable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: External (Resets to internal on-boot)"  
+		ujson=$(jq '.keyPriority = "ext"' $__json_file__)
+		echo $ujson > $__json_file__
+		xinput disable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: External (Resets to internal on-boot)"  
 
 	elif [ "$state" == "int" ]; then
-		jujson=$(jq '.keyPriority = "int"' $json_file)
-		echo $ujson > $json_file
-		xinput enable "AT Translated Set 2 keyboard" && echo "[bashme] Laptop-Keyboard-Priority: Internal"
+		jujson=$(jq '.keyPriority = "int"' $__json_file__)
+		echo $ujson > $__json_file__
+		xinput enable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: Internal"
 	else 
-		echo "[bashme] (priority: $(jq '.keyPriority' $json_file)) The two states of priority are: external (ext) and internal (int)"
+		echo "> (priority: $(jq '.keyPriority' $__json_file__)) The two states of priority are: external (ext) and internal (int)"
 	fi
 }
 
@@ -94,7 +105,7 @@ check_projdest()
 tpd()
 {
 	# Initialize File Paths
-	fp_proj="/home/$user/Documents/Projects_Folder"
+	fp_proj="$HOME/Documents/Projects_Folder"
 	fp_cpp="$fp_proj/cpp-projects"
 	fp_c="$fp_proj/c-projects"
 	fp_py="$fp_proj/python-projects"
@@ -106,7 +117,7 @@ tpd()
 	$(check_pyvenv)
 
 	# Jump to saved-working-directory
-	gjson=$(jq -r '.previousWorkingDirectory' $json_file)
+	gjson=$(jq -r '.previousWorkingDirectory' $__json_file__)
 	if [[ "$dest" == "saved" ]]; then
 		cd $gjson	
 	elif [ $proj -eq 1 ]; then
@@ -119,10 +130,10 @@ tpd()
 			if [[ $fp_py_ == "directory" && $py_vn_ == "ASCII text" ]]; then
 				cd $fp_py
 				source $py_vn
-				echo "[bashme] py-venv automatically deactivates when jumping to other project-folders,"
-				echo "[bashme] and to deactivate manually, type: deactivate"
+				echo "> py-venv automatically deactivates when jumping to other project-folders,"
+				echo "> and to deactivate manually, type: deactivate"
 			else
-				echo "[bashme] something went wrong with the py-folder-path or py-venv-folder-path. check code."
+				echo "> something went wrong with the py-folder-path or py-venv-folder-path. check code."
 				cd
 			fi
 		elif [ "$dest" == "c" ]; then
@@ -131,7 +142,7 @@ tpd()
 			if [ $fp_c_ == "directory" ]; then
 				cd $fp_c
 			else
-				echo "[bashme] something went wrong with the c-folder-path. check code."
+				echo "> something went wrong with the c-folder-path. check code."
 				cd
 			fi
 		elif [ "$dest" == "cpp" ]; then
@@ -140,18 +151,18 @@ tpd()
 			if [ $fp_cpp_ == "directory" ]; then
 				cd $fp_cpp
 			else
-				echo "[bashme] something went wrong with the cpp-folder-path. check code."
+				echo "> something went wrong with the cpp-folder-path. check code."
 				cd
 			fi
 		elif [ "$dest" == "home" ]; then
 			cd $fp_proj
 		else
-			echo -e "-- bashme start --\nhow come you forgot the project-folders you set?"
-			echo -e "those are (for now): 'py', 'c', 'cpp', and the 'home' folders\n-- bashme end --"
+			echo -e "how come you forgot the project-folders you set?"
+			echo -e "those are (for now): 'py', 'c', 'cpp', and the 'home' folders"
 
 		fi 
 	else
-		echo "[bashme] something went wrong with the project-folder-path. check code."
+		echo "> something went wrong with the project-folder-path. check code."
 	fi
 }
 
@@ -182,12 +193,12 @@ shelldroid(){
 		elif [[ $custom_ip =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ && $custom_port -ge 0 && $custom_port -le 65535 ]]; then
 			clear; adb connect $custom_ip:$custom_port && adb shell
 		else 
-			echo "[bashme] ip -- port error"
+			echo "> ip -- port error"
 		fi
 	elif [[ "$custom_ip" == "off" ]]; then
 		echo "[bashme-adb] $(adb disconnect)"; 
 	else
-		echo "[bashme] forgot to include ip or port?: shelldroid <ip> <port>"
+		echo "> forgot to include ip or port?: shelldroid <ip> <port>"
 	fi
 }
 
@@ -201,10 +212,10 @@ mim()
 		if [[ $network =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ && $target =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
 			sudo ettercap -T -S -i $nt_interface -M arp:remote /$network// /$target//
 		else
-			echo "[bashme] error whilst parsing ip-address."
+			echo "> error whilst parsing ip-address."
 		fi			
 	else
-		echo "[bashme] required fields: <network interface (wlan0, etc.)> <network ip> <target ip>"
+		echo "> required fields: <network interface (wlan0, etc.)> <network ip> <target ip>"
 	fi
 }
 
@@ -212,6 +223,7 @@ mim()
 tasukete(){
 	declare -A cmds
 
+	cmds[tim]="tim <file> ; opens a new terminal-tab and edits provided file with vim"
 	cmds[mim]="mim <network interface> <network ip> <target ip> ; does ettercap stuff"
 	cmds[refresh]="Refreshes the config.sh to apply new changes."
 	cmds[swd]="swd or swd clear ; saves current working directory, so that if new session opens it will cd to there."
@@ -221,31 +233,37 @@ tasukete(){
 	cmds[editme]="Edit this bash-config."
 	cmds[tasukete]="Prints this."
 
-	echo -e "-- bashme start --\n\ntips:"
+	echo -e "tip\s:"
 	echo "made changes to code? type refresh to apply"
 	echo -e "\nmy-commands: \n"
 
 	for key in "${!cmds[@]}"; do
-		echo -e "\x1b[4;1m$key\x1b[0m: ${cmds[$key]}"
+		if [ "$key" == "tasukete" ]; then
+			echo -e "\x1b[4;1m$key || helpme\x1b[0m: ${cmds[$key]}"
+		else
+			echo -e "\x1b[4;1m$key\x1b[0m: ${cmds[$key]}"
+		fi
 	done
 		
-	echo -e "\n-- bashme end --"
+	echo -e ""
 }
 
 alias helpme='tasukete'
 
 # randomized greeter
-chara=("Satania" "Gabriel" "Yui" "Mio" "Megumin" "Miu" "$user")
+__user__=$(whoami) # sigma
+__chara__=("Satania" "Gabriel" "Yui" "Mio" "Megumin" "Miu" "$__user__")
 
-size=${#chara[@]}
-index=$(($RANDOM % $size))
+__size__=${#__chara__[@]}
+__index__=$(($RANDOM % $__size__))
 
-echo -e "\x1b[1mこんにちは${chara[$index]}さん, 何でもやってもいいよ..\nconfig-cmds: helpme or tasukete\x1b[0m\n"
+echo -e "\x1b[1mこんにちは${__chara__[$__index__]}さん, 何でもやってもいいよ..\nconfig-cmds: helpme or tasukete\x1b[0m\n"
 
-gjson=$(jq -r '.previousWorkingDirectory' $json_file)
+__gjson__=$(jq -r '.previousWorkingDirectory' $__json_file__)
+__currwd__=$(pwd)
 	
-if [[ "$gjson" != "null" ]]; then
-	echo "Continuing from where you left off.."
+if [[ ("$__gjson__" != "null" && "$__gjson__" != "") && ("$__currwd" == "$HOME" && "$__currwd" != "$__gjson__"__) ]]; then
+	echo "> Continuing from where you left off.."
 	echo -e "To clear wd-cache type: swd clear\n"
 	cd $gjson
 fi
