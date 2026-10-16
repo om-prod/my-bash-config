@@ -14,8 +14,6 @@ alias wtfa='cd $__wtfa__'
 # git related aliases
 alias gpo='git push origin'
 
-
-
 # to edit this file
 __fp_self__="$HOME/my_bash_config/config.sh"
 __is_fp__="$(file -b $__fp_self__)"
@@ -266,8 +264,8 @@ echo -e "\x1b[1mこんにちは${__chara__[$__index__]}さん, 何でもやっ�
 __gjson__=$(jq -r '.previousWorkingDirectory' $__json_file__)
 __currwd__=$(pwd)
 	
-if [[ ("$__gjson__" != "null" && "$__gjson__" != "") && ("$__currwd" == "$HOME" && "$__currwd" != "$__gjson__"__) ]]; then
+if [[ ("$__gjson__" != "null" && "$__gjson__" != "") && ("$__currwd__" == "$HOME" && "$__currwd" != "$__gjson__") ]]; then
 	echo "> Continuing from where you left off.."
 	echo -e "To clear wd-cache type: swd clear\n"
-	cd $gjson
+	cd $__gjson__
 fi
