@@ -3,6 +3,7 @@
 # modules:
 # - adb 
 # - jq (for reading and writing JSON-files)
+# - git
 # - ~
 __wtfa__="$HOME/my_bash_config/"
 __json_file__="$HOME/my_bash_config/variables.json"
@@ -27,10 +28,10 @@ fi
 # refresh function to refresh config-script
 refresh()
 {
-	cd_=$(pwd)
+	#cd_=$(pwd)
 	clear
 	source $__fp_self__
-	cd $cd_
+	#cd $cd_
 }
 
 tim(){
