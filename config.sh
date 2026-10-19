@@ -5,6 +5,7 @@
 # - jq (for reading and writing JSON-files)
 # - git
 # - ~
+
 __wtfa__="$HOME/my_bash_config/"
 __json_file__="$HOME/my_bash_config/variables.json"
 
