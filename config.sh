@@ -5,14 +5,14 @@
 # - jq (for reading and writing JSON-files)
 # - git
 # - ~
-
-__wtfa__="$HOME/my_bash_config/"
+BASHCONFIG="$HOME/my_bash_config"
 __json_file__="$HOME/my_bash_config/variables.json"
 
 # aliases
 alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
 alias bye='exit'
-alias wtfa='cd $__wtfa__'
+alias wtfa='cd $BASHCONFIG'
+alias run='$BASHCONFIG/run $1 $2'
 # git related aliases
 alias gpo='git push origin'
 
@@ -269,7 +269,7 @@ echo -e "\x1b[1mこんにちは${__chara__[$__index__]}さん, 何でもやっ�
 
 __gjson__=$(jq -r '.previousWorkingDirectory' $__json_file__)
 __currwd__=$(pwd)
-	
+
 if [[ ("$__gjson__" != "null" && "$__gjson__" != "") && ("$__currwd__" == "$HOME" && "$__currwd" != "$__gjson__") ]]; then
 	echo "> Continuing from where you left off.."
 	echo -e "To clear wd-cache type: swd clear\n"
