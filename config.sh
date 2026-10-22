@@ -12,7 +12,7 @@ __json_file__="$HOME/my_bash_config/variables.json"
 alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
 alias bye='exit'
 alias wtfa='cd $BASHCONFIG'
-alias run='$BASHCONFIG/run $1 $2'
+alias run='$BASHCONFIG/run $1'
 # git related aliases
 alias gpo='git push origin'
 
@@ -267,11 +267,8 @@ __index__=$(($RANDOM % $__size__))
 
 echo -e "\x1b[1mこんにちは${__chara__[$__index__]}さん, 何でもやってもいいよ..\nconfig-cmds: helpme or tasukete\x1b[0m\n"
 
-__gjson__=$(jq -r '.previousWorkingDirectory' $__json_file__)
-__currwd__=$(pwd)
-
-if [[ ("$__gjson__" != "null" && "$__gjson__" != "") && ("$__currwd__" == "$HOME" && "$__currwd" != "$__gjson__") ]]; then
+if [[ ("$(jq -r '.previousWorkingDirectory' $__json_file__)" != "null" && "$(jq -r '.previousWorkingDirectory' $__json_file__)" != "") && ("$(pwd)" == "$HOME" && "$__currwd" != "$(jq -r '.previousWorkingDirectory' $__json_file__)") ]]; then
 	echo "> Continuing from where you left off.."
 	echo -e "To clear wd-cache type: swd clear\n"
-	cd $__gjson__
+	cd $(jq -r '.previousWorkingDirectory' $__json_file__)
 fi
