@@ -8,14 +8,6 @@
 BASHCONFIG="$HOME/my_bash_config"
 __json_file__="$HOME/my_bash_config/variables.json"
 
-# aliases
-alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
-alias bye='exit'
-alias wtfa='cd $BASHCONFIG'
-alias run='$BASHCONFIG/run $1'
-# git related aliases
-alias gpo='git push origin'
-
 # to edit this file
 __fp_self__="$HOME/my_bash_config/config.sh"
 __is_fp__="$(file -b $__fp_self__)"
@@ -26,14 +18,16 @@ else
 	echo "> something went wrong with the bashconfig-folder-path. check code."
 fi
 
-# refresh function to refresh config-script
-refresh()
-{
-	#cd_=$(pwd)
-	clear
-	source $__fp_self__
-	#cd $cd_
-}
+# aliases
+alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
+alias bye='exit'
+alias append='gnome-terminal --tab -- $1'
+alias wtfa='cd $BASHCONFIG'
+alias run='$BASHCONFIG/run $1'
+alias refresh='clear && source $__fp_self__'
+
+# git related aliases/functions
+alias gpo='git push origin'
 
 tim(){
 	file=$1
@@ -72,10 +66,10 @@ keyprio()
 	if [ "$state" == "ext" ]; then
 		ujson=$(jq '.keyPriority = "ext"' $__json_file__)
 		echo $ujson > $__json_file__
-		xinput disable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: External (Resets to internal on-boot)"  
+		xinput disable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: External"  
 
 	elif [ "$state" == "int" ]; then
-		jujson=$(jq '.keyPriority = "int"' $__json_file__)
+		ujson=$(jq '.keyPriority = "int"' $__json_file__)
 		echo $ujson > $__json_file__
 		xinput enable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: Internal"
 	else 
