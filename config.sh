@@ -5,11 +5,14 @@
 # - jq (for reading and writing JSON-files)
 # - git
 # - ~
-BASHCONFIG="$HOME/my_bash_config"
-__json_file__="$HOME/my_bash_config/variables.json"
 
+BASHCONFIG="$HOME/my-bash-config"
+__json_file__="$HOME/my-bash-config/variables.json"
+
+PATH=$PATH:$HOME/my-bash-config/bin
+export PATH
 # to edit this file
-__fp_self__="$HOME/my_bash_config/config.sh"
+__fp_self__="$HOME/my-bash-config/config.sh"
 __is_fp__="$(file -b $__fp_self__)"
 
 if [ "$__is_fp__" == "Bourne-Again shell script, Unicode text, UTF-8 text executable" ]; then
@@ -23,7 +26,6 @@ alias buttery='upower -i /org/freedesktop/UPower/devices/battery_BAT0'
 alias bye='exit'
 alias append='gnome-terminal --tab -- $1'
 alias wtfa='cd $BASHCONFIG'
-alias run='$BASHCONFIG/run $1'
 alias refresh='clear && source $__fp_self__'
 
 # git related aliases/functions
@@ -64,9 +66,13 @@ keyprio()
 	state=$1
 
 	if [ "$state" == "ext" ]; then
-		ujson=$(jq '.keyPriority = "ext"' $__json_file__)
-		echo $ujson > $__json_file__
-		xinput disable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: External"  
+		if [ "$(lsusb | grep 'c0f4:05c0')" != "" ]; then
+			ujson=$(jq '.keyPriority = "ext"' $__json_file__)
+			echo $ujson > $__json_file__
+			xinput disable "AT Translated Set 2 keyboard" && echo "> Laptop-Keyboard-Priority: External"  
+		else
+			echo "> No external keyboard detected"
+		fi
 
 	elif [ "$state" == "int" ]; then
 		ujson=$(jq '.keyPriority = "int"' $__json_file__)
@@ -77,31 +83,31 @@ keyprio()
 	fi
 }
 
-# functions for going to different projects dest./folders
-__check_pyvenv()
-{
- 	is_vevn="$(type -t deactivate)"
-
-	if [ "$is_vevn" == "function" ]; then
-		echo "deactivate"
-		# returns keyword "deactivate" and $(..) runs it
-	fi
-}
-
-__check_projdest()
-{
-	fp_proj_="$(file -b $fp_proj)"
-
-	if [ "$fp_proj_" == "directory" ]; then
-		echo 1
-	else
-		echo 0
-	fi
-}
 
 # teleport to directory
 tpd()
 {
+	# functions for going to different projects dest./folders
+	__check_pyvenv()
+	{
+	 	is_vevn="$(type -t deactivate)"
+	
+		if [ "$is_vevn" == "function" ]; then
+			echo "deactivate"
+			# returns keyword "deactivate" and $(..) runs it
+		fi
+	}
+
+	__check_projdest()
+	{
+		fp_proj_="$(file -b $fp_proj)"
+
+		if [ "$fp_proj_" == "directory" ]; then
+			echo 1
+		else
+			echo 0
+		fi
+	}	
 	# Initialize File Paths
 	fp_proj="$HOME/Documents/Projects_Folder"
 	fp_cpp="$fp_proj/cpp-projects"
