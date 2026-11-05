@@ -227,6 +227,7 @@ mim()
 tasukete(){
 	declare -A cmds
 
+	cmds[run]="run <c or cpp file> ; compiles, runs, and after running deletes <file>.out, it's more for testing code."
 	cmds[gpo]="Shortcut of 'git push origin'"
 	cmds[bye]="Exits"
 	cmds[wtfa]="Change directory to wherever this file is."
