@@ -11,6 +11,7 @@ __json_file__="$HOME/my-bash-config/variables.json"
 
 PATH=$PATH:$HOME/my-bash-config/bin
 export PATH
+
 # to edit this file
 __fp_self__="$HOME/my-bash-config/config.sh"
 __is_fp__="$(file -b $__fp_self__)"
@@ -27,11 +28,13 @@ alias bye='exit'
 alias append='gnome-terminal --tab -- $1'
 alias wtfa='cd $BASHCONFIG'
 alias refresh='clear && source $__fp_self__'
+alias basic='gnome-terminal --title "Bywater BASIC Interpreter/Shell" --tab -- bwbasic'
 
 # git related aliases/functions
 alias gpo='git push origin'
 
-tim(){
+tim()
+{
 	file=$1
 
 	if [ "$file" != "" ]; then
@@ -39,6 +42,12 @@ tim(){
 	else 
 		echo "> provide a file to edit."
 	fi
+}
+
+create()
+{
+	file=$1
+	touch $file && subl $file
 }
 
 # function for saving current-working-directory
@@ -227,6 +236,8 @@ mim()
 tasukete(){
 	declare -A cmds
 
+	cmds[create]="create <file name>.<ext> | creates a file and opens sublime to edit it."
+	cmds[basic]="basic | opens bwbasic in a new terminal tab."
 	cmds[run]="run <c or cpp file> ; compiles, runs, and after running deletes <file>.out, it's more for testing code."
 	cmds[gpo]="Shortcut of 'git push origin'"
 	cmds[bye]="Exits"
